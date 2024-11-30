@@ -130,3 +130,26 @@ def sizeHint(self, option, index):
             return QSize(option.rect.width(), total_height)
 
     return super().sizeHint(option, index)
+
+class MessageModel(QAbstractListModel):
+    def __init__(self, messages=None):
+        super().__init__()
+        self.messages = messages if messages else []
+
+    def rowCount(self, parent=QModelIndex()):
+        return len(self.messages)
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            return self.messages[index.row()]
+        return None
+
+    def add_message(self, message_item):
+        self.beginInsertRows(QModelIndex(), len(self.messages), len(self.messages))
+        self.messages.append(message_item)
+        self.endInsertRows()
+
+    def update_message(self, index, new_message_item):
+        if 0 <= index < len(self.messages):
+            self.messages[index] = new_message_item
+            self.dataChanged.emit(self.index(index), self.index(index))
