@@ -107,3 +107,26 @@ class MessageDelegate(QStyledItemDelegate):
             painter.drawPixmap(avatar_x, avatar_y, self.avatar_size, self.avatar_size, avatar)
 
             painter.restore()
+
+def sizeHint(self, option, index):
+    message_item = index.model().data(index, Qt.DisplayRole)
+
+    if message_item:
+        if message_item.image:
+            image = message_item.image.scaledToWidth(self.bubble_max_width, Qt.SmoothTransformation)
+            bubble_height = image.height() + 2 * self.padding
+            total_height = max(bubble_height, self.avatar_size) + self.padding
+            return QSize(option.rect.width(), total_height)
+        else:
+            font = QFont("Segoe UI", 10)
+            text_document = QTextDocument()
+            text_document.setDefaultFont(font)
+            text_document.setDefaultStyleSheet("")  # 使用默认样式
+            text_document.setMarkdown(message_item.message)
+            text_document.setTextWidth(self.bubble_max_width)
+
+            text_height = text_document.size().height()
+            total_height = max(text_height + 2 * self.padding, self.avatar_size) + self.padding
+            return QSize(option.rect.width(), total_height)
+
+    return super().sizeHint(option, index)
