@@ -18,14 +18,6 @@
     - 聊天消息以气泡形式展示，支持文本和图片消息。
     - 界面支持拖动，增强用户交互体验。
 
-![image](https://github.com/user-attachments/assets/7badb6e2-a0f0-4fc6-8b3c-2a1f02e09223)
-
-![image](https://github.com/user-attachments/assets/69aa643b-6c8b-46bf-a77a-17ea34a6bc63)
-
-![image](https://github.com/user-attachments/assets/b7cf1e1b-6fae-4290-82dd-7361b229639b)
-
-![image](https://github.com/user-attachments/assets/e62935d4-5a9c-4566-b2b4-74c02e4127ec)
-
 ---
 
 ## 技术细节
