@@ -18,13 +18,13 @@
     - 聊天消息以气泡形式展示，支持文本和图片消息。
     - 界面支持拖动，增强用户交互体验。
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6408d47-51ff-490b-a414-7a0fee40c839/7f7f7455-a59e-49c8-81d4-9d83d5d161c2/image.png)
+![image](https://github.com/user-attachments/assets/7badb6e2-a0f0-4fc6-8b3c-2a1f02e09223)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6408d47-51ff-490b-a414-7a0fee40c839/2c098610-918c-44b8-b2e6-abbc3502cafd/image.png)
+![image](https://github.com/user-attachments/assets/69aa643b-6c8b-46bf-a77a-17ea34a6bc63)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6408d47-51ff-490b-a414-7a0fee40c839/4b7e7fda-e8b5-4e44-aa68-130c2442b174/image.png)
+![image](https://github.com/user-attachments/assets/b7cf1e1b-6fae-4290-82dd-7361b229639b)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6408d47-51ff-490b-a414-7a0fee40c839/ef5110f9-a195-49b6-a27d-5b4df32277bd/image.png)
+![image](https://github.com/user-attachments/assets/e62935d4-5a9c-4566-b2b4-74c02e4127ec)
 
 ---
 
