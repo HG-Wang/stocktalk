@@ -492,8 +492,8 @@ class StockTalkChatWindow(QWidget):
         # 添加分析模式选择下拉菜单
         from PySide6.QtWidgets import QComboBox
         self.mode_selector = QComboBox()
-        self.mode_selector.addItem("深度分析", "deep")
         self.mode_selector.addItem("快速分析", "fast")
+        self.mode_selector.addItem("深度分析", "deep")
         self.mode_selector.setFixedWidth(120)
         self.mode_selector.setStyleSheet("""
             QComboBox {
@@ -533,13 +533,12 @@ class StockTalkChatWindow(QWidget):
         self.layout.addWidget(content_widget)
 
         self.conversation = [{"role": "system",
-                              "content": "你是一位金融专家，专门解答与金融相关的问题。请提供专业、准确的金融建议和信息，避免提及任何开发背景、技术细节或平台信息，以确保专注于解决用户的金融问题。"}]
+                              "content": "你是一位金融专家，专门解答与金融相关的问题。请提供专业、准确的金融建议和信息，避免提及任何开发背景、技术细节或平台信息，以确保专注于用通俗的语言解决用户的金融问题。"}]
         self.responseReady.connect(self.display_response)
 
         self.loading_message_index = None
 
-        self.loading_texts = ["", ".", "..", "..."]
-        self.current_loading_index = 0
+        # 移除 loading_texts 以避免与“正在获取回复，请稍候...”冲突
         self.loading_timer = QTimer(self)
         self.loading_timer.setInterval(500)
         self.loading_timer.timeout.connect(self.update_loading_message)
@@ -579,13 +578,19 @@ class StockTalkChatWindow(QWidget):
     def set_background_image(self, image_path):
         self.background_image = image_path
         self.setStyleSheet(f"""
-            QWidget {{
+            QWidget#main_widget {{
                 background-image: url("{self.background_image}");
                 background-repeat: no-repeat;
                 background-position: center;
                 background-color: rgba(0, 0, 0, 100);
             }}
+            QPushButton {{
+                background-color: #3498db;
+            }}
         """)
+        print(f"背景图片已设置为: {image_path}")
+        print(f"当前样式表: {self.styleSheet()}")
+        print(f"发送按钮样式: {self.send_button.styleSheet()}")
 
     def send_message(self):
         message = self.input_box.toPlainText().strip()
@@ -661,9 +666,6 @@ class StockTalkChatWindow(QWidget):
         self.responseReady.emit("正在获取回复，请稍候...")
 
         self.loading_message_index = self.model.rowCount() - 1
-
-        self.current_loading_index = 0
-
         self.loading_timer.start()
 
         threading.Thread(target=self.get_response, args=(message,), daemon=True).start()
@@ -688,7 +690,6 @@ class StockTalkChatWindow(QWidget):
             response.raise_for_status()
 
             assistant_message = ""
-            self.responseReady.emit("正在获取回复，请稍候...")  # 初始化消息气泡
             for chunk in response.iter_lines():
                 if chunk:
                     try:
@@ -738,13 +739,8 @@ class StockTalkChatWindow(QWidget):
         self.list_view.scrollToBottom()
 
     def update_loading_message(self):
-        if self.loading_message_index is not None:
-            new_text = self.loading_texts[self.current_loading_index]
-            loading_message = MessageItem(new_text, sender="助手", is_sent=False)
-            loading_message.avatar = QPixmap(self.assistant_avatar_path)  # 设置加载消息的头像
-            self.model.update_message(self.loading_message_index, loading_message)
-            self.current_loading_index = (self.current_loading_index + 1) % len(self.loading_texts)
-            self.list_view.scrollToBottom()
+        # 移除加载动画更新逻辑，使用固定的“正在获取回复，请稍候...”文本
+        pass
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
