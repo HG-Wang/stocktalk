@@ -101,7 +101,13 @@ class ImageViewer(QDialog):
         
         # 设置图像显示
         self.view.setSceneRect(self.pixmap_item.boundingRect())
-        self.view.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
+        # 初始化缩放比例和状态标签
+        self.zoom_level = 1.0
+        self.status_label = QLabel(f"缩放比例: {int(self.zoom_level * 100)}%", self)
+        self.status_label.setStyleSheet("color: #ecf0f1; font-size: 12px;")
+        layout.addWidget(self.status_label)
+
+
         
         # 显示关闭提示
         close_hint = QLabel("按ESC键或点击关闭按钮退出", self)
@@ -110,14 +116,16 @@ class ImageViewer(QDialog):
         
         layout.addWidget(close_hint)
         
-        # 添加状态栏显示缩放比例
-        self.zoom_level = 1.0
-        self.status_label = QLabel(f"缩放比例: 100%", self)
-        self.status_label.setStyleSheet("color: #ecf0f1; font-size: 12px;")
-        layout.addWidget(self.status_label)
+        # 状态栏已在前面初始化
         
         # 设置窗口尺寸和位置
         self.resize(900, 700)
+
+        # 在初始化时调用重置大小方法，适应窗口大小
+        self.reset_zoom()
+        self.update_status()
+        
+
         
     def resizeEvent(self, event):
         self.view.fitInView(self.pixmap_item, Qt.KeepAspectRatio)

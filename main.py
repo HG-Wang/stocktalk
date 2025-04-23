@@ -50,7 +50,7 @@ plt.rcParams['axes.grid'] = True              # 默认显示网格
 plt.rcParams['grid.alpha'] = 0.3              # 网格透明度
 plt.rcParams['grid.linestyle'] = '--'         # 网格线样式
 
-API_KEY = '95391dfcc5194055a072f0662c7e69ab'
+API_KEY = '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'
 
 def plot_stock_prediction(hist, forecast, actual, stock_code, analysis_mode='deep'):
     """
@@ -672,19 +672,28 @@ class StockTalkChatWindow(QWidget):
 
     def get_response(self, message=None):
         try:
-            url = "https://api.lingyiwanwu.com/v1/chat/completions"
+            url = "https://openrouter.ai/api/v1/chat/completions"
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {API_KEY}"
+                "Authorization": f"Bearer {API_KEY}",
+                "HTTP-Referer": "https://your-site-url.com",  # 可选，替换为您的网站URL
+                "X-Title": "StockTalk AI"  # 可选，替换为您的网站名称
             }
             payload = {
-                "model": "yi-lightning",
+                "model": "thudm/glm-z1-32b:free",
                 "messages": self.conversation,
                 "temperature": 0.9
             }
 
             response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
+
+            # 检查响应内容是否为空
+            if not response.text:
+                raise ValueError("API 响应为空")
+
+            # 打印响应内容以便调试
+            print(f"API 响应内容: {response.text}")
 
             result = response.json()
             assistant_message = result['choices'][0]['message']['content'].strip()
