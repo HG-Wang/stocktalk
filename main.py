@@ -3,6 +3,7 @@ import threading
 import time
 import datetime
 import os
+import json
 
 import requests
 import yfinance as yf
@@ -50,7 +51,7 @@ plt.rcParams['axes.grid'] = True              # 默认显示网格
 plt.rcParams['grid.alpha'] = 0.3              # 网格透明度
 plt.rcParams['grid.linestyle'] = '--'         # 网格线样式
 
-API_KEY = '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'
+API_KEY = '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'
 
 def plot_stock_prediction(hist, forecast, actual, stock_code, analysis_mode='deep'):
     """
@@ -682,23 +683,32 @@ class StockTalkChatWindow(QWidget):
             payload = {
                 "model": "thudm/glm-z1-32b:free",
                 "messages": self.conversation,
-                "temperature": 0.9
+                "temperature": 0.9,
+                "stream": True  # 启用流式输出
             }
 
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(url, headers=headers, json=payload, stream=True)
             response.raise_for_status()
 
-            # 检查响应内容是否为空
-            if not response.text:
-                raise ValueError("API 响应为空")
+            assistant_message = ""
+            for chunk in response.iter_lines():
+                if chunk:
+                    try:
+                        # 解析流式数据
+                        line = chunk.decode('utf-8')
+                        if line.startswith("data: "):
+                            data = line[6:]  # 去掉 "data: " 前缀
+                            if data == "[DONE]":
+                                break
+                            json_data = json.loads(data)
+                            delta = json_data['choices'][0]['delta'].get('content', '')
+                            if delta:
+                                assistant_message += delta
+                                self.responseReady.emit(delta)  # 实时发送内容片段
+                    except Exception as e:
+                        print(f"处理流式数据时发生错误：{e}")
 
-            # 打印响应内容以便调试
-            print(f"API 响应内容: {response.text}")
-
-            result = response.json()
-            assistant_message = result['choices'][0]['message']['content'].strip()
             self.conversation.append({"role": "assistant", "content": assistant_message})
-            self.responseReady.emit(assistant_message)
         except Exception as e:
             print(f"获取回复时发生错误：{e}")
             self.responseReady.emit("抱歉，获取回复时出错。")
@@ -706,14 +716,23 @@ class StockTalkChatWindow(QWidget):
     def display_response(self, response):
         self.loading_timer.stop()
 
-        new_message = MessageItem(response, sender="助手", is_sent=False)
-        new_message.avatar = QPixmap(self.assistant_avatar_path)
-
-        if self.loading_message_index is not None:
-            self.model.update_message(self.loading_message_index, new_message)
-            self.loading_message_index = None
-        else:
+        if response == "正在获取回复，请稍候...":
+            new_message = MessageItem(response, sender="助手", is_sent=False)
+            new_message.avatar = QPixmap(self.assistant_avatar_path)
             self.model.add_message(new_message)
+            self.loading_message_index = self.model.rowCount() - 1
+        else:
+            if self.loading_message_index is not None:
+                current_message = self.model.data(self.model.index(self.loading_message_index), Qt.DisplayRole)
+                updated_text = current_message.message + response
+                updated_message = MessageItem(updated_text, sender="助手", is_sent=False)
+                updated_message.avatar = QPixmap(self.assistant_avatar_path)
+                self.model.update_message(self.loading_message_index, updated_message)
+            else:
+                new_message = MessageItem(response, sender="助手", is_sent=False)
+                new_message.avatar = QPixmap(self.assistant_avatar_path)
+                self.model.add_message(new_message)
+                self.loading_message_index = self.model.rowCount() - 1
 
         self.list_view.scrollToBottom()
 
