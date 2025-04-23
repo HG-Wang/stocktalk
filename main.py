@@ -332,7 +332,6 @@ class StockTalkChatWindow(QWidget):
             QScrollBar::handle:vertical {
                 background: #3498db;
                 min-height: 30px;
-                border-radius: 5px;
             }
             QScrollBar::handle:vertical:hover {
                 background: #2980b9;
@@ -357,7 +356,7 @@ class StockTalkChatWindow(QWidget):
         title_layout = QHBoxLayout(title_bar)
         title_layout.setContentsMargins(15, 0, 15, 0)
 
-        title = QLabel("实时交易信号智能对话助手")
+        title = QLabel("StalkTalk AI  ")
         title.setObjectName("title")
         title_font = QFont("Microsoft YaHei", 17, QFont.Bold)
         title.setFont(title_font)
@@ -368,7 +367,7 @@ class StockTalkChatWindow(QWidget):
         title_layout.addStretch()
 
         settings_button = QToolButton()
-        settings_button.setText("⚙️")
+        settings_button.setText(" Settings ")
         settings_button.setStyleSheet("""
             QToolButton {
                 color: white;
@@ -378,7 +377,6 @@ class StockTalkChatWindow(QWidget):
             }
             QToolButton:hover {
                 background-color: rgba(255, 255, 255, 0.15);
-                border-radius: 5px;
             }
         """)
         settings_button.clicked.connect(self.open_settings)
@@ -540,7 +538,7 @@ class StockTalkChatWindow(QWidget):
 
         self.loading_message_index = None
 
-        self.loading_texts = ["加载中", "加载中.", "加载中..", "加载中..."]
+        self.loading_texts = ["", ".", "..", "..."]
         self.current_loading_index = 0
         self.loading_timer = QTimer(self)
         self.loading_timer.setInterval(500)
@@ -656,7 +654,6 @@ class StockTalkChatWindow(QWidget):
         self.list_view.scrollToBottom()
     
         self.responseReady.emit(report)
-        self.responseReady.emit("分析中，请稍候...")
         self.conversation.append({"role": "user", "content": report})
         self.get_response(report)
 
@@ -691,6 +688,7 @@ class StockTalkChatWindow(QWidget):
             response.raise_for_status()
 
             assistant_message = ""
+            self.responseReady.emit("正在获取回复，请稍候...")  # 初始化消息气泡
             for chunk in response.iter_lines():
                 if chunk:
                     try:
@@ -724,7 +722,10 @@ class StockTalkChatWindow(QWidget):
         else:
             if self.loading_message_index is not None:
                 current_message = self.model.data(self.model.index(self.loading_message_index), Qt.DisplayRole)
-                updated_text = current_message.message + response
+                if current_message.message == "正在获取回复，请稍候...":
+                    updated_text = response
+                else:
+                    updated_text = current_message.message + response
                 updated_message = MessageItem(updated_text, sender="助手", is_sent=False)
                 updated_message.avatar = QPixmap(self.assistant_avatar_path)
                 self.model.update_message(self.loading_message_index, updated_message)
