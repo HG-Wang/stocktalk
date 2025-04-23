@@ -21,7 +21,7 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
 # 直接导入utils模块
-from utils import ImageViewer
+from utils.image_viewer import ImageViewer
 
 class MessageItem:
     def __init__(self, message='', sender="我", is_sent=True, image=None):
@@ -328,7 +328,7 @@ class MessageDelegate(QStyledItemDelegate):
                     print("图片被点击 - 准备打开查看器")
                     # 直接创建并显示图片查看器
                     try:
-                        from utils import ImageViewer
+                        from utils.image_viewer import ImageViewer
                         viewer = ImageViewer(self.current_image, self.parent_view)
                         viewer.exec()
                         print("查看器关闭")

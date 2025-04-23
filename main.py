@@ -38,8 +38,8 @@ from PySide6.QtWidgets import (
     QGraphicsPixmapItem
 )
 
-from interface.Message import MessageDelegate,MessageItem,MessageModel
-from utils import ImageViewer  # 从utils模块导入ImageViewer类
+from ui.message import MessageDelegate, MessageItem, MessageModel
+from utils.image_viewer import ImageViewer  # 从utils模块导入ImageViewer类
 
 # 设置字体为支持中文的字体，例如 SimSun（宋体）、SimHei（黑体）
 plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -281,7 +281,7 @@ def plot_stock_prediction(hist, forecast, actual, stock_code, analysis_mode='dee
     plt.close()
 
 
-class TelegramLikeChat(QWidget):
+class StockTalkChatWindow(QWidget):
     responseReady = Signal(str)
 
     def __init__(self):
@@ -611,7 +611,7 @@ class TelegramLikeChat(QWidget):
             threading.Thread(target=self.stock_analysis, args=(stock_code.strip().upper(), analysis_mode), daemon=True).start()
             
     def stock_analysis(self, stock_code, analysis_mode='deep'):
-        from analyze.analyze_stock import analyze_stock, fetch_stock
+        from analysis.stock_analysis import analyze_stock, fetch_stock
         hist = fetch_stock(stock_code)
         # 如果没有找到股票数据，返回提示
         if hist.empty:
@@ -739,6 +739,6 @@ class TelegramLikeChat(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setFont(QFont("Segoe UI", 10))
-    window = TelegramLikeChat()
+    window = StockTalkChatWindow()
     window.show()
     sys.exit(app.exec())

@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import numpy as np
-from financeAss import plot_stock_prediction
+from main import plot_stock_prediction
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
